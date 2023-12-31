@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "recsyslabs"
+version = "0.1.0"
+description = ""
+authors = ["fontanads <fontanads@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+packages = [
+    { include = "recsyslabs", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^1.26.2"
+pandas = "^2.1.4"
+altair = "^5.2.0"
+matplotlib = "^3.8.2"
+
+
+[tool.poetry.group.dev.dependencies]
+jupyterlab = "^4.0.10"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

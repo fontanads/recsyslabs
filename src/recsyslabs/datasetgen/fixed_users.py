@@ -2,31 +2,19 @@
 
 import numpy as np
 import pandas as pd
-from typing import Tuple
+from recsyslabs.datasetgen.tabular_data import TabularData
 from recsyslabs.datasetgen.dataset import Dataset
 from recsyslabs.datasetgen.interactions_sim import (
     single_user_item_interaction,
     multi_user_item_interaction)
 
 
-class TabularData:
+class FixedUsers(TabularData):
 
-    def __init__(
-            self,
-            n_users: int,
-            n_items: int,
-            items_pmf: np.array,
-            ratings_domain: Tuple[int, int] = None) -> Dataset:
-        self.n_users = n_users
-        self.n_items = n_items
-        self.items_pmf = items_pmf
-        if ratings_domain is not None:
-            assert ratings_domain[0] < ratings_domain[1]
-            self.ratings_domain = ratings_domain
-        else:
-            self.ratings_domain = (-1, 1)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def generate_fixed_num_users_single_interaction(self) -> Dataset:
+    def generate_single_interaction(self) -> Dataset:
         """Controls the number of users in the dataset.
         Every user has a single interaction with an item.
 
@@ -38,6 +26,8 @@ class TabularData:
             single_user_item_interaction(
                 n_items=self.n_items,
                 items_pmf=self.items_pmf,
+                ratings_alphabet=self.ratings_alphabet,
+                ratings_pmf=self.rating_pmf,
                 ratings_domain=self.ratings_domain)
             for _ in range(self.n_users)])
         df = pd.DataFrame(
@@ -46,7 +36,9 @@ class TabularData:
         df['user_id'] = np.arange(self.n_users)
         return Dataset(df)
 
-    def generate_fixed_num_users_multi_interaction(self, num_interactions: int) -> Dataset:
+    def generate_multi_interaction(
+            self,
+            num_interactions: int) -> Dataset:
         """Controls the number of users in the dataset.
         Every user has multiple interactions with items.
 
@@ -59,7 +51,10 @@ class TabularData:
                 n_interactions=num_interactions,
                 n_items=self.n_items,
                 items_pmf=self.items_pmf,
-                ratings_domain=self.ratings_domain)
+                ratings_alphabet=self.ratings_alphabet,
+                ratings_domain=self.ratings_domain,
+                ratings_pmf=self.rating_pmf
+                )
             for _ in range(self.n_users)])
         df = pd.DataFrame(
             interactions.reshape(-1, 2),
